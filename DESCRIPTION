@@ -1,7 +1,8 @@
 Package: xgboostExplainer
 Title: XGBoost Model Explainer
 Version: 0.1
-Authors@R: person("David", "Foster", email = "david@applied-data.science", role = c("aut", "cre"))
+Author: David Foster <david@applied-data.science>
+Maintainer: David Foster <david@applied-data.science>
 Description: XGBoost is a very successful machine learning package based on boosted trees. This package allows the predictions from an xgboost model to be split into the impact of each feature, making the model as transparent as a linear regression or decision tree.
 Depends: R (>= 3.0.0)
 Imports: data.table, xgboost, waterfalls, scales, ggplot2
