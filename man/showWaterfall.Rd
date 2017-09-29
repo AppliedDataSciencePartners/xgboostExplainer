@@ -4,16 +4,17 @@
 \alias{showWaterfall}
 \title{Step 3: Get prediction breakdown and waterfall chart for a single row of data}
 \usage{
-showWaterfall(xgb.model, explainer, data, DMatrix, idx, type = "binary")
+showWaterfall(xgb.model, explainer, DMatrix, data.matrix, idx,
+  type = "binary")
 }
 \arguments{
 \item{xgb.model}{A trained xgboost model}
 
 \item{explainer}{The output from the buildExplainer function, for this model}
 
-\item{data}{The data table from which the row to be explained is drawn from}
+\item{DMatrix}{The DMatrix in which the row to be predicted is stored}
 
-\item{DMatrix}{The DMatrix corresponding to the data variable}
+\item{data.matrix}{The matrix of data from which the DMatrix was built}
 
 \item{idx}{The row number of the data to be explained}
 
@@ -57,6 +58,6 @@ trees = xgb.model.dt.tree(col_names, model = xgb.model)
 explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
 pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 
-showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 2, type = "binary")
-showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 8, type = "binary")
+showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
+showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  8, type = "binary")
 }

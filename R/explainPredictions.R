@@ -43,8 +43,8 @@
 #' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
 #' pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 #'
-#' showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 2, type = "binary")
-#' showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 8, type = "binary")
+#' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
+#' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  8, type = "binary")
 
 explainPredictions = function(xgb.model, explainer ,data){
 

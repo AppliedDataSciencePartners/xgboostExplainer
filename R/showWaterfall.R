@@ -3,8 +3,8 @@
 #' This function prints the feature impact breakdown for a single data row, and plots an accompanying waterfall chart.
 #' @param xgb.model A trained xgboost model
 #' @param explainer The output from the buildExplainer function, for this model
-#' @param data The data table from which the row to be explained is drawn from
-#' @param DMatrix The DMatrix corresponding to the data variable
+#' @param DMatrix The DMatrix in which the row to be predicted is stored
+#' @param data.matrix The matrix of data from which the DMatrix was built
 #' @param idx The row number of the data to be explained
 #' @param type The objective function of the model - either "binary" (for binary:logistic) or "regression" (for reg:linear)
 #' @return None
@@ -46,10 +46,10 @@
 #' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
 #' pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 #'
-#' showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 2, type = "binary")
-#' showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 8, type = "binary")
+#' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
+#' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  8, type = "binary")
 
-showWaterfall = function(xgb.model, explainer, data, DMatrix,idx, type = "binary"){
+showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type = "binary"){
 
 
   breakdown = explainPredictions(xgb.model, explainer, slice(DMatrix,as.integer(idx)))
@@ -63,7 +63,7 @@ showWaterfall = function(xgb.model, explainer, data, DMatrix,idx, type = "binary
 
 
   breakdown_summary = as.matrix(breakdown)[1,]
-  data_for_label = data[idx,]
+  data_for_label = data.matrix[idx,]
 
   idx = order(abs(breakdown_summary),decreasing=TRUE)
   breakdown_summary = breakdown_summary[idx]
