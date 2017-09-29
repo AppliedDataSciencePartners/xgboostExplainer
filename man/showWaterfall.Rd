@@ -4,14 +4,18 @@
 \alias{showWaterfall}
 \title{Step 3: Get prediction breakdown and waterfall chart for a single row of data}
 \usage{
-showWaterfall(xgb.model, explainer, data, type = "binary")
+showWaterfall(xgb.model, explainer, data, DMatrix, idx, type = "binary")
 }
 \arguments{
 \item{xgb.model}{A trained xgboost model}
 
 \item{explainer}{The output from the buildExplainer function, for this model}
 
-\item{data}{A single row (slice) of a DMatrix, that the waterfall chart will be built from}
+\item{data}{The data table from which the row to be explained is drawn from}
+
+\item{DMatrix}{The DMatrix corresponding to the data variable}
+
+\item{idx}{The row number of the data to be explained}
 
 \item{type}{The objective function of the model - either "binary" (for binary:logistic) or "regression" (for reg:linear)}
 }
@@ -34,8 +38,11 @@ y = agaricus.train$label
 
 train_idx = 1:5000
 
-xgb.train.data <- xgb.DMatrix(X[train_idx,], label = y[train_idx])
-xgb.test.data <- xgb.DMatrix(X[-train_idx,])
+train.data = X[train_idx,]
+test.data = X[-train_idx,]
+
+xgb.train.data <- xgb.DMatrix(train.data, label = y[train_idx])
+xgb.test.data <- xgb.DMatrix(test.data)
 
 param <- list(objective = "binary:logistic")
 xgb.model <- xgboost(param =param,  data = xgb.train.data, nrounds=3)
@@ -50,6 +57,6 @@ trees = xgb.model.dt.tree(col_names, model = xgb.model)
 explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
 pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 
-showWaterfall(xgb.model, explainer, slice(xgb.test.data, as.integer(2)), type = "binary")
-showWaterfall(xgb.model, explainer, slice(xgb.test.data, as.integer(8)), type = "binary")
+showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 2, type = "binary")
+showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 8, type = "binary")
 }

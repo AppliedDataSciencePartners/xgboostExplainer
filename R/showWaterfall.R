@@ -3,7 +3,9 @@
 #' This function prints the feature impact breakdown for a single data row, and plots an accompanying waterfall chart.
 #' @param xgb.model A trained xgboost model
 #' @param explainer The output from the buildExplainer function, for this model
-#' @param data A single row (slice) of a DMatrix, that the waterfall chart will be built from
+#' @param data The data table from which the row to be explained is drawn from
+#' @param DMatrix The DMatrix corresponding to the data variable
+#' @param idx The row number of the data to be explained
 #' @param type The objective function of the model - either "binary" (for binary:logistic) or "regression" (for reg:linear)
 #' @return None
 #' @export
@@ -25,8 +27,11 @@
 #'
 #' train_idx = 1:5000
 #'
-#' xgb.train.data <- xgb.DMatrix(X[train_idx,], label = y[train_idx])
-#' xgb.test.data <- xgb.DMatrix(X[-train_idx,])
+#' train.data = X[train_idx,]
+#' test.data = X[-train_idx,]
+#'
+#' xgb.train.data <- xgb.DMatrix(train.data, label = y[train_idx])
+#' xgb.test.data <- xgb.DMatrix(test.data)
 #'
 #' param <- list(objective = "binary:logistic")
 #' xgb.model <- xgboost(param =param,  data = xgb.train.data, nrounds=3)
@@ -41,13 +46,13 @@
 #' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
 #' pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 #'
-#' showWaterfall(xgb.model, explainer, slice(xgb.test.data, as.integer(2)), type = "binary")
-#' showWaterfall(xgb.model, explainer, slice(xgb.test.data, as.integer(8)), type = "binary")
+#' showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 2, type = "binary")
+#' showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 8, type = "binary")
 
-showWaterfall = function(xgb.model, explainer, data, type = "binary"){
+showWaterfall = function(xgb.model, explainer, data, DMatrix,idx, type = "binary"){
 
 
-  breakdown = explainPredictions(xgb.model, explainer,data)
+  breakdown = explainPredictions(xgb.model, explainer, slice(DMatrix,as.integer(idx)))
 
   weight = rowSums(breakdown)
   if (type == 'regression'){
@@ -58,7 +63,7 @@ showWaterfall = function(xgb.model, explainer, data, type = "binary"){
 
 
   breakdown_summary = as.matrix(breakdown)[1,]
-  data_for_label = as.matrix(data)[1,]
+  data_for_label = data[idx,]
 
   idx = order(abs(breakdown_summary),decreasing=TRUE)
   breakdown_summary = breakdown_summary[idx]
@@ -82,8 +87,8 @@ showWaterfall = function(xgb.model, explainer, data, type = "binary"){
   labels[1] = 'intercept'
 
 
-  if (!is.null(getinfo(data,"label"))){
-    cat("\nActual: ", getinfo(data,"label"))
+  if (!is.null(getinfo(DMatrix,"label"))){
+    cat("\nActual: ", getinfo(DMatrix,"label"))
   }
   cat("\nPrediction: ", pred)
   cat("\nWeight: ", weight)

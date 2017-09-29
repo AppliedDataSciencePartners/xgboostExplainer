@@ -34,8 +34,11 @@ y = agaricus.train$label
 
 train_idx = 1:5000
 
-xgb.train.data <- xgb.DMatrix(X[train_idx,], label = y[train_idx])
-xgb.test.data <- xgb.DMatrix(X[-train_idx,])
+train.data = X[train_idx,]
+test.data = X[-train_idx,]
+
+xgb.train.data <- xgb.DMatrix(train.data, label = y[train_idx])
+xgb.test.data <- xgb.DMatrix(test.data)
 
 param <- list(objective = "binary:logistic")
 xgb.model <- xgboost(param =param,  data = xgb.train.data, nrounds=3)
@@ -50,6 +53,6 @@ trees = xgb.model.dt.tree(col_names, model = xgb.model)
 explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
 pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 
-showWaterfall(xgb.model, explainer, slice(xgb.test.data, as.integer(2)), type = "binary")
-showWaterfall(xgb.model, explainer, slice(xgb.test.data, as.integer(8)), type = "binary")
+showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 2, type = "binary")
+showWaterfall(xgb.model, explainer, test.data, xgb.test.data, 8, type = "binary")
 }
