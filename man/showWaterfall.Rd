@@ -5,7 +5,7 @@
 \title{Step 3: Get prediction breakdown and waterfall chart for a single row of data}
 \usage{
 showWaterfall(xgb.model, explainer, DMatrix, data.matrix, idx,
-  type = "binary")
+  type = "binary", threshold = 1e-04)
 }
 \arguments{
 \item{xgb.model}{A trained xgboost model}
@@ -19,6 +19,8 @@ showWaterfall(xgb.model, explainer, DMatrix, data.matrix, idx,
 \item{idx}{The row number of the data to be explained}
 
 \item{type}{The objective function of the model - either "binary" (for binary:logistic) or "regression" (for reg:linear)}
+
+\item{threshold}{Default = 0.0001. The waterfall chart will group all variables with absolute impact less than the threshold into a variable called 'Other'}
 }
 \value{
 None

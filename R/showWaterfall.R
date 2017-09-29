@@ -7,6 +7,7 @@
 #' @param data.matrix The matrix of data from which the DMatrix was built
 #' @param idx The row number of the data to be explained
 #' @param type The objective function of the model - either "binary" (for binary:logistic) or "regression" (for reg:linear)
+#' @param threshold Default = 0.0001. The waterfall chart will group all variables with absolute impact less than the threshold into a variable called 'Other'
 #' @return None
 #' @export
 #' @import data.table
@@ -49,7 +50,7 @@
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  8, type = "binary")
 
-showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type = "binary"){
+showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type = "binary", threshold = 0.0001){
 
 
   breakdown = explainPredictions(xgb.model, explainer, slice(DMatrix,as.integer(idx)))
@@ -69,22 +70,32 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
   breakdown_summary = breakdown_summary[idx]
   data_for_label = data_for_label[idx]
 
-  idx_zero =which(breakdown_summary==0)
-
-  if (length(idx_zero > 0)){
-    breakdown_summary = breakdown_summary[-idx_zero]
-    data_for_label = data_for_label[-idx_zero]
-  }
-
   intercept = breakdown_summary[names(breakdown_summary)=='intercept']
   data_for_label = data_for_label[names(breakdown_summary)!='intercept']
   breakdown_summary = breakdown_summary[names(breakdown_summary)!='intercept']
 
+  idx_other =which(abs(breakdown_summary)<threshold)
 
-  breakdown_summary = c(intercept, breakdown_summary)
-  data_for_label = c("", data_for_label)
-  labels = paste0(names(breakdown_summary)," = ", data_for_label)
-  labels[1] = 'intercept'
+  if (length(idx_other > 0)){
+    other_impact = sum(breakdown_summary[idx_other])
+    names(other_impact) = 'other'
+    breakdown_summary = breakdown_summary[-idx_other]
+    data_for_label = data_for_label[-idx_other]
+  }
+
+  if (abs(other_impact) > 0){
+    breakdown_summary = c(intercept, breakdown_summary, other_impact)
+    data_for_label = c("", data_for_label,"")
+    labels = paste0(names(breakdown_summary)," = ", data_for_label)
+    labels[1] = 'intercept'
+    labels[length(labels)] = 'other'
+  }else{
+    breakdown_summary = c(intercept, breakdown_summary)
+    data_for_label = c("", data_for_label)
+    labels = paste0(names(breakdown_summary)," = ", data_for_label)
+    labels[1] = 'intercept'
+  }
+
 
 
   if (!is.null(getinfo(DMatrix,"label"))){
