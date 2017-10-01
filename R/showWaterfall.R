@@ -75,6 +75,7 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
   breakdown_summary = breakdown_summary[names(breakdown_summary)!='intercept']
 
   idx_other =which(abs(breakdown_summary)<threshold)
+  other_impact = 0
 
   if (length(idx_other > 0)){
     other_impact = sum(breakdown_summary[idx_other])
