@@ -44,7 +44,7 @@
 #' trees = xgb.model.dt.tree(col_names, model = xgb.model)
 #'
 #' #### The XGBoost Explainer
-#' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5)
+#' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, n_first_tree = xgb.model$best_ntreelimit - 1)
 #' pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 #'
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
