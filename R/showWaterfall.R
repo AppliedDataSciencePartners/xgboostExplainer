@@ -100,7 +100,7 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
 
   if (!is.null(getinfo(DMatrix,"label"))){
-    cat("\nActual: ", getinfo(DMatrix,"label"))
+    cat("\nActual: ", getinfo(slice(DMatrix,as.integer(idx)),"label"))
   }
   cat("\nPrediction: ", pred)
   cat("\nWeight: ", weight)
