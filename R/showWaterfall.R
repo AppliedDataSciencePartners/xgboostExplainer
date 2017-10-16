@@ -64,24 +64,24 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
 
   breakdown_summary = as.matrix(breakdown)[1,]
-  data_for_label = data.matrix[idx,]
+  data_for_label = data.matrix[i,]
 
-  idx = order(abs(breakdown_summary),decreasing=TRUE)
-  breakdown_summary = breakdown_summary[idx]
-  data_for_label = data_for_label[idx]
+  i = order(abs(breakdown_summary),decreasing=TRUE)
+  breakdown_summary = breakdown_summary[i]
+  data_for_label = data_for_label[i]
 
   intercept = breakdown_summary[names(breakdown_summary)=='intercept']
   data_for_label = data_for_label[names(breakdown_summary)!='intercept']
   breakdown_summary = breakdown_summary[names(breakdown_summary)!='intercept']
 
-  idx_other =which(abs(breakdown_summary)<threshold)
+  i_other =which(abs(breakdown_summary)<threshold)
   other_impact = 0
 
-  if (length(idx_other > 0)){
-    other_impact = sum(breakdown_summary[idx_other])
+  if (length(i_other > 0)){
+    other_impact = sum(breakdown_summary[i_other])
     names(other_impact) = 'other'
-    breakdown_summary = breakdown_summary[-idx_other]
-    data_for_label = data_for_label[-idx_other]
+    breakdown_summary = breakdown_summary[-i_other]
+    data_for_label = data_for_label[-i_other]
   }
 
   if (abs(other_impact) > 0){
