@@ -114,12 +114,16 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
   if (type == 'regression'){
 
-  waterfall(values = breakdown_summary, rect_text_labels = round(breakdown_summary, 2), labels = labels, total_rect_text = round(weight, 2)
-            , calc_total = TRUE
-            , total_axis_text = "Prediction")  + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  waterfalls::waterfall(values = breakdown_summary,
+                        rect_text_labels = round(breakdown_summary, 2),
+                        labels = labels,
+                        total_rect_text = round(weight, 2),
+                        calc_total = TRUE,
+                        total_axis_text = "Prediction") +
+                          theme(axis.text.x = element_text(angle = 45, hjust = 1))
   }else{
 
-    inverse_logit_trans <- trans_new("inverse logit",
+    inverse_logit_trans <- scales::trans_new("inverse logit",
                                      transform = plogis,
                                      inverse = qlogis)
 
@@ -128,9 +132,15 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
     ybreaks<-logit(seq(2,98,2)/100)
 
-    waterfall(values = breakdown_summary, rect_text_labels = round(breakdown_summary, 2), labels = labels, total_rect_text = round(weight, 2)
-              , calc_total = TRUE
-              , total_axis_text = "Prediction")  + scale_y_continuous(labels = inverse_logit_labels, breaks = ybreaks) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    waterfalls::waterfall(values = breakdown_summary,
+                          rect_text_labels = round(breakdown_summary, 2),
+                          labels = labels,
+                          total_rect_text = round(weight, 2),
+                          calc_total = TRUE,
+                          total_axis_text = "Prediction")  +
+                            scale_y_continuous(labels = inverse_logit_labels,
+                                                breaks = ybreaks) +
+                            theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
   }
 }
