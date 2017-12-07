@@ -10,8 +10,6 @@
 #' @param threshold Default = 0.0001. The waterfall chart will group all variables with absolute impact less than the threshold into a variable called 'Other'
 #' @param printPlot Default = TRUE, which prints the plot. If FALSE, returns ggplot object (e.g. for adding labels to)
 #' @param calcTotal Default = TRUE, which calculates and plots the total pool of the waterfall.
-#' @param show_intercept Default = TRUE, whether to show the intercept.
-
 #' @return None
 #' @export
 #' @import data.table
@@ -54,9 +52,7 @@
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  8, type = "binary")
 
-
-showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type = "binary", threshold = 0.0001, printPlot = TRUE, calcTotal = TRUE, show_intercept = TRUE)){
-
+showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type = "binary", threshold = 0.0001, printPlot = TRUE, calcTotal = TRUE){
 
 
   breakdown = explainPredictions(xgb.model, explainer, slice(DMatrix,as.integer(idx)))
@@ -67,6 +63,7 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
   }else{
     pred = 1/(1+exp(-weight))
   }
+
 
   breakdown_summary = as.matrix(breakdown)[1,]
 
@@ -93,25 +90,19 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
     data_for_label = data_for_label[-i_other]
   }
 
-  if (show_intercept){
-    breakdown_summary = c(c(intercept), breakdown_summary)
-    data_for_label = c(c(""), data_for_label)
-  }
-
   if (abs(other_impact) > 0){
-    breakdown_summary = c(breakdown_summary, c(other_impact))
-    data_for_label = c(data_for_label, c(""))
-  }
-
-  labels = paste0(names(breakdown_summary)," = ", data_for_label)
-
-  if (show_intercept) {
+    breakdown_summary = c(intercept, breakdown_summary, other_impact)
+    data_for_label = c("", data_for_label,"")
+    labels = paste0(names(breakdown_summary)," = ", data_for_label)
+    labels[1] = 'intercept'
+    labels[length(labels)] = 'other'
+  }else{
+    breakdown_summary = c(intercept, breakdown_summary)
+    data_for_label = c("", data_for_label)
+    labels = paste0(names(breakdown_summary)," = ", data_for_label)
     labels[1] = 'intercept'
   }
 
-  if (abs(other_impact) > 0){
-    labels[length(labels)] = 'other'
-  }
 
 
   if (!is.null(getinfo(DMatrix,"label"))){
@@ -124,39 +115,26 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
   print(breakdown_summary)
 
 
-  y_ticks_shift = function(x) {
-    if (show_intercept) {
-      return(x)
-    }
-    else {
-      return(round(x + intercept, 2))
-    }
-  }
-
-
   if (type == 'regression'){
 
   waterfalls::waterfall(values = breakdown_summary,
                         rect_text_labels = round(breakdown_summary, 2),
                         labels = labels,
                         total_rect_text = round(weight, 2),
-
-                        calc_total = TRUE,
+                        calc_total = calcTotal,
                         total_axis_text = "Prediction",
                         print_plot = printPlot) +
-                          scale_y_continuous(labels = y_ticks_shift) +
-                           theme(axis.text.x = element_text(angle = 45,
+                          theme(axis.text.x = element_text(angle = 45,
                                                            hjust = 1),
                                 axis.title = element_text(),
                                 axis.title.x = element_blank())
-
   }else{
 
     inverse_logit_trans <- scales::trans_new("inverse logit",
                                      transform = plogis,
                                      inverse = qlogis)
 
-    inverse_logit_labels = function(x){return (y_ticks_shift(1/(1+exp(-x))))}
+    inverse_logit_labels = function(x){return (1/(1+exp(-x)))}
     logit = function(x){return(log(x/(1-x)))}
 
     ybreaks<-logit(seq(2,98,2)/100)
