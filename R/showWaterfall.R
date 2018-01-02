@@ -71,8 +71,6 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
   i = order(abs(breakdown_summary),decreasing=TRUE)
 
-
-
   breakdown_summary = breakdown_summary[i]
   data_for_label = data_for_label[i]
 
@@ -139,6 +137,7 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
     ybreaks<-logit(seq(2,98,2)/100)
 
+  cat(ybreaks)
     waterfalls::waterfall(values = breakdown_summary,
                           rect_text_labels = round(breakdown_summary, 2),
                           labels = labels,
