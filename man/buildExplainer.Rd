@@ -5,7 +5,7 @@
 \title{Step 1: Build an xgboostExplainer}
 \usage{
 buildExplainer(xgb.model, trainingData, type = "binary", base_score = 0.5,
-  n_first_tree = NULL)
+  trees_idx = NULL)
 }
 \arguments{
 \item{xgb.model}{A trained xgboost model}
@@ -16,7 +16,7 @@ buildExplainer(xgb.model, trainingData, type = "binary", base_score = 0.5,
 
 \item{base_score}{Default 0.5. The base_score variable of the xgboost model.}
 
-\item{n_first_tree}{Default NULL. The number of trees to include in the model.}
+\item{trees_idx}{Default NULL. An integer vector of tree indices that should be parsed. If set to NULL, all trees of the model are parsed.}
 }
 \value{
 The XGBoost Explainer for the model. This is a data table where each row is a leaf of a tree in the xgboost model
@@ -60,7 +60,7 @@ nodes.train = predict(xgb.model,X,predleaf =TRUE)
 trees = xgb.model.dt.tree(col_names, model = xgb.model)
 
 #### The XGBoost Explainer
-explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, n_first_tree = xgb.model$best_ntreelimit - 1)
+explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, trees = NULL)
 pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 
 showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")

@@ -47,7 +47,7 @@
 #' trees = xgb.model.dt.tree(col_names, model = xgb.model)
 #'
 #' #### The XGBoost Explainer
-#' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, n_first_tree = xgb.model$best_ntreelimit - 1)
+#' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, trees = NULL)
 #' pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 #'
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
@@ -133,7 +133,6 @@ showWaterfall = function(xgb.model, explainer, DMatrix, data.matrix, idx, type =
 
     ybreaks<-logit(seq(2,98,2)/100)
 
-  cat(ybreaks)
     waterfalls::waterfall(values = breakdown_summary,
                           rect_text_labels = round(breakdown_summary, 2),
                           labels = labels,

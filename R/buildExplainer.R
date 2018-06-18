@@ -5,7 +5,7 @@
 #' @param trainingData A DMatrix of data used to train the model
 #' @param type The objective function of the model - either "binary" (for binary:logistic) or "regression" (for reg:linear)
 #' @param base_score Default 0.5. The base_score variable of the xgboost model.
-#' @param n_first_tree Default NULL. The number of trees to include in the model.
+#' @param trees_idx Default NULL. An integer vector of tree indices that should be parsed. If set to NULL, all trees of the model are parsed.
 #' @return The XGBoost Explainer for the model. This is a data table where each row is a leaf of a tree in the xgboost model
 #'  and each column is the impact of each feature on the prediction at the leaf.
 #'
@@ -47,18 +47,18 @@
 #' trees = xgb.model.dt.tree(col_names, model = xgb.model)
 #'
 #' #### The XGBoost Explainer
-#' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, n_first_tree = xgb.model$best_ntreelimit - 1)
+#' explainer = buildExplainer(xgb.model,xgb.train.data, type="binary", base_score = 0.5, trees = NULL)
 #' pred.breakdown = explainPredictions(xgb.model, explainer, xgb.test.data)
 #'
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  2, type = "binary")
 #' showWaterfall(xgb.model, explainer, xgb.test.data, test.data,  8, type = "binary")
 
 
-buildExplainer = function(xgb.model, trainingData, type = "binary", base_score = 0.5, n_first_tree = NULL){
+buildExplainer = function(xgb.model, trainingData, type = "binary", base_score = 0.5, trees_idx = NULL){
 
   col_names = attr(trainingData, ".Dimnames")[[2]]
   cat('\nCreating the trees of the xgboost model...')
-  trees = xgb.model.dt.tree(col_names, model = xgb.model, n_first_tree = n_first_tree)
+  trees = xgb.model.dt.tree(col_names, model = xgb.model, trees = trees_idx)
   cat('\nGetting the leaf nodes for the training set observations...')
   nodes.train = predict(xgb.model,trainingData,predleaf =TRUE)
 
