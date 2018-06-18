@@ -68,7 +68,7 @@ buildExplainer = function(xgb.model, trainingData, type = "binary", base_score =
   cat('\n\nSTEP 2 of 2')
   explainer = buildExplainerFromTreeList(tree_list,col_names)
 
-  cat('\n\nDONE!\n')
+  cat('\n\nDONE!\n\n')
 
   return (explainer)
 }
